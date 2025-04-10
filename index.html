@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Verduras</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <div class="container mt-5">
+    <div class="card shadow">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4">Calculadora de Verduras 🥬</h3>
+
+        <div class="mb-3">
+          <label for="nomeItem" class="form-label">Nome do item:</label>
+          <input type="text" class="form-control" id="nomeItem" placeholder="Ex: Alface">
+        </div>
+
+        <div class="mb-3">
+          <label for="precoKg" class="form-label">Preço por kg (R$):</label>
+          <input type="number" class="form-control" id="precoKg" placeholder="Ex: 5.99" step="0.01">
+        </div>
+
+        <div class="mb-3">
+          <label for="pesoG" class="form-label">Peso (g):</label>
+          <input type="number" class="form-control" id="pesoG" placeholder="Ex: 350" step="1">
+        </div>
+
+        <div class="d-grid gap-2 mb-3">
+          <button id="calcular" class="btn btn-success">Calcular</button>
+          <button id="limpar" class="btn btn-danger">Limpar</button>
+        </div>
+
+        <div id="resultado" class="alert alert-info d-none"></div>
+
+        <hr>
+
+        <h5 class="mt-4">Histórico de Itens:</h5>
+        <ul id="listaHistorico" class="list-group mb-3"></ul>
+
+        <button id="calcularTotal" class="btn btn-primary w-100">Calcular Total</button>
+        <button id="limparHistorico" class="btn btn-outline-secondary w-100 mt-2">Limpar Histórico</button>
+        <div id="totalFinal" class="alert alert-secondary mt-3 d-none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS + Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const calcularBtn = document.getElementById('calcular');
+    const limparBtn = document.getElementById('limpar');
+    const calcularTotalBtn = document.getElementById('calcularTotal');
+    const resultado = document.getElementById('resultado');
+    const listaHistorico = document.getElementById('listaHistorico');
+    const totalFinal = document.getElementById('totalFinal');
+
+    let historicoValores = [];
+
+    calcularBtn.addEventListener('click', () => {
+      const nomeItem = document.getElementById('nomeItem').value.trim();
+      const precoKg = parseFloat(document.getElementById('precoKg').value);
+      const pesoG = parseFloat(document.getElementById('pesoG').value);
+
+      if (!nomeItem || isNaN(precoKg) || isNaN(pesoG)) {
+        resultado.textContent = "Preencha todos os campos corretamente.";
+        resultado.classList.remove("d-none", "alert-info");
+        resultado.classList.add("alert-warning");
+        return;
+      }
+
+      const pesoKg = pesoG / 1000;
+      const valorTotal = precoKg * pesoKg;
+
+      resultado.textContent = `${nomeItem}: R$ ${valorTotal.toFixed(2)} (${pesoG}g a R$ ${precoKg.toFixed(2)}/kg)`;
+      resultado.classList.remove("d-none", "alert-warning");
+      resultado.classList.add("alert-info");
+
+      historicoValores.push(valorTotal);
+      const item = document.createElement('li');
+      item.className = "list-group-item";
+      item.textContent = `${nomeItem}: R$ ${valorTotal.toFixed(2)} (${pesoG}g a R$ ${precoKg.toFixed(2)}/kg)`;
+      listaHistorico.appendChild(item);
+    });
+
+    limparBtn.addEventListener('click', () => {
+      document.getElementById('nomeItem').value = '';
+      document.getElementById('precoKg').value = '';
+      document.getElementById('pesoG').value = '';
+      resultado.textContent = '';
+      resultado.classList.add("d-none");
+      totalFinal.textContent = '';
+      totalFinal.classList.add("d-none");
+    });
+
+    calcularTotalBtn.addEventListener('click', () => {
+      if (historicoValores.length === 0) {
+        totalFinal.textContent = 'Nenhum item no histórico.';
+        totalFinal.classList.remove("d-none");
+        return;
+      }
+
+      const soma = historicoValores.reduce((acc, val) => acc + val, 0);
+      totalFinal.textContent = `Total a pagar por todos os itens: R$ ${soma.toFixed(2)}`;
+      totalFinal.classList.remove("d-none");
+    });
+    const limparHistoricoBtn = document.getElementById('limparHistorico');
+
+        limparHistoricoBtn.addEventListener('click', () => {
+        historicoValores = [];
+        listaHistorico.innerHTML = '';
+        totalFinal.textContent = '';
+        totalFinal.classList.add("d-none");
+        });
+
+  </script>
+</body>
+</html>
